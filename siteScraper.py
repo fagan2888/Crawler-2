@@ -6,13 +6,15 @@ import re
 q = ["http://hadoop.apache.org/docs/current/index.html"]
 base = '/home/srijan/crawl/hadoop/'
 rt = 'http://hadoop.apache.org/'
+counter = 0
 
 def getPage():
 	if len(q) is 0:
 		print "Finished"
+		_ = input()
 		return
 	url = q.pop(0)
-	print url
+	print str(counter)+" : "+url
 	try:
 		if ".html" not in url and ".pdf" not in url :
 			print "Not useful"
@@ -33,6 +35,9 @@ def getPage():
 			cur = pt + "/"
 		else:
 			fname = base + fname
+		if os.path.isfile(fname) :
+			print "already done"
+			return
 		page = urllib.urlopen(url).read()
 		if not os.path.isfile(fname) :
 			f = open(fname,"w")
@@ -48,15 +53,16 @@ def getPage():
 			      	i = i.replace("\'","")
 			      	i = i.replace("\n","")
 			      	if "http" not in i and "#" not in i:
-			      		q.append(rt + cur + i)
+			      		s1 = rt + cur + i
+			      		while '/../' in s1:
+						s1 = re.sub('/[^/]*?/../','/',s1)
+			      		q.append(s1)
 			      	elif rt in i:
 			      		q.append(i)
+		global counter 
+		counter = counter + 1
 	except:
 		print "Error occured"
 
 while(1):
 	getPage()
-	q = list(set(q))
-	      	
-
-	
